@@ -49,7 +49,7 @@ class Mage(Character):
     RANGE_VALUE_ATTACK = (5, 10)
     RANGE_VALUE_DEFENCE = (-2, 2)
     SPECIAL_SKILL = 'Атака'
-    SPECIAL_BUFF = DEFAULT_STAMINA + 40
+    SPECIAL_BUFF = DEFAULT_ATTACK + 40
 
 
 class Healer(Character):
@@ -58,17 +58,14 @@ class Healer(Character):
     RANGE_VALUE_ATTACK = (-3, -1)
     RANGE_VALUE_DEFENCE = (2, 5)
     SPECIAL_SKILL = 'Защита'
-    SPECIAL_BUFF = DEFAULT_STAMINA + 30
+    SPECIAL_BUFF = DEFAULT_DEFENCE + 30
 
 
-def start_training(char_name: str, char_class: Optional[str]) -> str:
+def start_training(character):
     """Функция тренировки персонажа."""
-    if char_class == 'warrior':
-        print(f'{char_name}, ты Воитель — отличный боец ближнего боя.')
-    if char_class == 'mage':
-        print(f'{char_name}, ты Маг — превосходный укротитель стихий.')
-    if char_class == 'healer':
-        print(f'{char_name}, ты Лекарь — чародей, способный исцелять раны.')
+    commands = {'attack': character.attack,
+                'defence': character.defence,
+                'special': character.special}
     print('Потренируйся управлять своими навыками.')
     print('Введи одну из команд: attack — чтобы атаковать противника, '
           'defence — чтобы блокировать атаку противника '
@@ -77,26 +74,21 @@ def start_training(char_name: str, char_class: Optional[str]) -> str:
     cmd: Optional[str] = None
     while cmd != 'skip':
         cmd = input('Введи команду: ')
-        if cmd == 'attack':
-            print(attack(char_name, char_class))
-        if cmd == 'defence':
-            print(defence(char_name, char_class))
-        if cmd == 'special':
-            print(special(char_name, char_class))
+        if cmd in commands:
+            print(commands[cmd]())
     return 'Тренировка окончена.'
 
 
-def choice_char_class(char_name: str) -> Character:
+def choice_char_class(char_name: str) -> Optional[Character]:
     """Функция выбора класса персонажа."""
     game_classes = {'warrior': Warrior, 'mage': Mage, 'healer': Healer}
-
     approve_choice: Optional[str] = None
-
+    char_class: Optional[Character] = None
     while approve_choice != 'y':
         selected_class = input('Введи название персонажа, '
                                'за которого хочешь играть: Воитель — warrior, '
                                'Маг — mage, Лекарь — healer: ')
-        char_class: Character = game_classes[selected_class](char_name)
+        char_class = game_classes[selected_class](char_name)
         print(char_class)
         approve_choice = input('Нажми (Y), чтобы подтвердить выбор, '
                                'или любую другую кнопку, '
@@ -113,5 +105,5 @@ if __name__ == '__main__':
           'Сейчас твоя выносливость — 80, атака — 5 и защита — 10.')
     print('Ты можешь выбрать один из трёх путей силы:')
     print('Воитель, Маг, Лекарь')
-    char_class: Optional[str] = choice_char_class()
-    print(start_training(char_name, char_class))
+    char_class: Optional[Character] = choice_char_class(char_name)
+    print(start_training(char_class))
